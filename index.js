@@ -129,7 +129,7 @@ const displayController = (()=>{
     const checkWinner = (trueCount, falseCount) => {
         if(trueCount == 3 || falseCount == 3 ) {
             winner = true;
-            trueCount == 3 ?  setMessage("p1 wins") :  setMessage("p2 wins");
+            trueCount == 3 ?  setMessage(`${playerA.name} wins`) :  setMessage(`${playerB.name} wins`);
             showMessage();
         }
     }
@@ -160,32 +160,22 @@ const displayController = (()=>{
         form.classList.add("hidden");
     }
 
+    const createPlayers = () => {
+        let data = document.getElementById('form')
+        playerA = playerFactory(data.elements['playerOne'].value, 1)
+        playerB = playerFactory(data.elements['playerTwo'].value, 2)
+    }
+
     const startGame = () => {
         board.createBoard();
 
-        playerA = playerFactory()
-
+        createPlayers();
         hideForm();
-
-
     }
 
     return {checkForWinner, reset, showMessage, setMessage, startGame}
 })();
 
 const playerFactory = (name, number) => {
-    const getName = () => {
-        return this.name;
-    }
-
-    const getNumber = () => {
-        return this.number;
-    }
-    return {getName, getNumber};
+    return {name, number};
 }
-
-// board.createBoard();
-
-// let playerOne = playerFactory("A", 1);
-// let playerTwo = playerFactory("B", 2);
-
