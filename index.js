@@ -55,6 +55,8 @@ const board = (() => {
 })();
 
 const displayController = (()=>{
+    let playerA = null;
+    let playerB = null;
     let playerOne = true;
     let currentTurn = 0;
     let winner = false;
@@ -152,15 +154,38 @@ const displayController = (()=>{
         let winnerMessage = document.querySelector('.winnerMessage');
         winnerMessage.innerHTML = message
     }
-    return {checkForWinner, reset, showMessage, setMessage}
+
+    const hideForm = () => {
+        let form = document.querySelector(".form");
+        form.classList.add("hidden");
+    }
+
+    const startGame = () => {
+        board.createBoard();
+
+        playerA = playerFactory()
+
+        hideForm();
+
+
+    }
+
+    return {checkForWinner, reset, showMessage, setMessage, startGame}
 })();
 
 const playerFactory = (name, number) => {
-    return {};
+    const getName = () => {
+        return this.name;
+    }
+
+    const getNumber = () => {
+        return this.number;
+    }
+    return {getName, getNumber};
 }
 
-board.createBoard();
+// board.createBoard();
 
-let playerOne = playerFactory("A", 1);
-let playerTwo = playerFactory("B", 2);
+// let playerOne = playerFactory("A", 1);
+// let playerTwo = playerFactory("B", 2);
 
