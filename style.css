@@ -46,3 +46,7 @@ div .row:nth-child(odd) div:nth-child(odd) {
 .square {
     border: 1px solid black;
 }
+
+.hidden {
+    display: none;
+}

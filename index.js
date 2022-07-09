@@ -1,14 +1,10 @@
 const board = (() => {
     const gridSize = 3;
     let boardState = [[],[],[]];
-    let currentTurn = 0;
-    let winner = false;
-
 
     const createBoard = () => {
         let container = document.querySelector(".container");
         
-
         for(let i = 0; i<gridSize; i++) {
             let row = createRow(i);
             container.appendChild(row)
@@ -33,27 +29,52 @@ const board = (() => {
         square.classList.add('square')
 
         square.addEventListener('click', function(e) {
-            currentTurn++;
             placeMark(e);
             updateBoard(e);
-
-            if(currentTurn >= 5) {
-                checkForWinner(e);
-            }
-            
-            if(currentTurn == 9 && !winner) {
-                console.log("it's a tie")
-            }
+            displayController.checkForWinner(e)
         })
 
         return square;
     }
 
     const updateBoard = (e) => {
-
         let rowIndex = parseInt(e.target.dataset.row)
         let colIndex = parseInt(e.target.dataset.col)
         boardState[rowIndex][colIndex] = e.target.innerHTML == 'o';
+    }    
+
+    const reset = () => {
+        let container = document.querySelector(".container");
+        container.querySelectorAll('*').forEach(n => n.remove());
+        boardState = [[],[],[]]
+        createBoard();
+        displayController.reset();
+    }
+
+    return {createBoard, reset, boardState};
+})();
+
+const displayController = (()=>{
+    let playerOne = true;
+    let currentTurn = 0;
+    let winner = false;
+
+    placeMark = (e) => {
+        if(e.target.innerHTML == "") {
+            let index = parseInt(e.target.dataset.squareId);
+            e.target.innerHTML = playerOne ? 'o' : 'x';
+            playerOne = !playerOne;
+            currentTurn++;
+
+            if(currentTurn >= 5) {
+                checkForWinner(e);
+            }
+            
+            if(currentTurn == 9 && !winner) {
+                displayController.setMessage("It's a tie")
+                displayController.showMessage();
+            }
+        }   
     }
 
     const checkForWinner = (e) => {
@@ -66,12 +87,12 @@ const board = (() => {
     const checkRow = (rowIndex) => {
         let trueCount = 0;
         let falseCount = 0;
-        
-        for(let i = 0; i<boardState[rowIndex].length; i++) {
-            if(boardState[rowIndex][i] == undefined) {
+
+        for(let i = 0; i<board.boardState.length; i++) {
+            if(board.boardState[rowIndex][i] == undefined) {
                 break; //if anything in the row is empty then we can stop
             }
-            boardState[rowIndex][i] ? trueCount++ : falseCount++;
+            board.boardState[rowIndex][i] ? trueCount++ : falseCount++;
         }
         checkWinner(trueCount,falseCount);
     }
@@ -80,11 +101,11 @@ const board = (() => {
         let trueCount = 0;
         let falseCount = 0;
         
-        for(let i = 0; i<gridSize; i++) {
-            if(boardState[i][colIndex] == undefined) {
+        for(let i = 0; i<board.boardState.length; i++) {
+            if(board.boardState[i][colIndex] == undefined) {
                 break;
             }
-            boardState[i][colIndex] ? trueCount++ : falseCount++;
+            board.boardState[i][colIndex] ? trueCount++ : falseCount++;
 
         }
         checkWinner(trueCount,falseCount);
@@ -95,44 +116,50 @@ const board = (() => {
         let falseCount = 0;
         
         for(let i = 0; i<diagonal.length; i++) {
-            if(boardState[diagonal[i][0]][diagonal[i][1]] == undefined) {
+            if(board.boardState[diagonal[i][0]][diagonal[i][1]] == undefined) {
                 break;
             }   
-            boardState[diagonal[i][0]][diagonal[i][1]] ? trueCount++ : falseCount++; 
+            board.boardState[diagonal[i][0]][diagonal[i][1]] ? trueCount++ : falseCount++; 
         }
         checkWinner(trueCount,falseCount);
     }
 
     const checkWinner = (trueCount, falseCount) => {
         if(trueCount == 3 || falseCount == 3 ) {
-            trueCount == 3 ? console.log("p1 wins") : console.log("p2 wins");
             winner = true;
+            trueCount == 3 ?  setMessage("p1 wins") :  setMessage("p2 wins");
+            showMessage();
         }
     }
-
-    return {createBoard, boardState};
-})();
-
-const displayController = (()=>{
-    let player = true;
-
-    placeMark = (e) => {
-        if(e.target.innerHTML == "") {
-            let index = parseInt(e.target.dataset.squareId);
-            e.target.innerHTML = player ? 'o' : 'x';
-            player = !player;
-        }   
+    const reset = () => {
+        playerOne = true;
+        currentTurn = 0;
+        winner = false;
+        hideMessage();
     }
+
+    const hideMessage = () => {
+        let winnerContainer =  document.querySelector('.winnerContainer');
+        winnerContainer.classList.add('hidden');
+    }
+
+    const showMessage = () => {
+        let winnerContainer =  document.querySelector('.winnerContainer');
+        winnerContainer.classList.remove('hidden')
+    }
+
+    const setMessage = (message) => {
+        let winnerMessage = document.querySelector('.winnerMessage');
+        winnerMessage.innerHTML = message
+    }
+    return {checkForWinner, reset, showMessage, setMessage}
 })();
 
 const playerFactory = (name, number) => {
     return {};
 }
 
-
-
 board.createBoard();
-
 
 let playerOne = playerFactory("A", 1);
 let playerTwo = playerFactory("B", 2);
