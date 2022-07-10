@@ -8,20 +8,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div>
+        <form class="form" id="form">
+            <label for="playerOne">Player One Name</label>
+            <input type="text" id="playerOne" value="A">
+            <label for="playerTwo">Player Two Name</label>
+            <input type="text" id="playerTwo" value="B">
+            <button type="button" onclick="displayController.startGame()">Start</button>
+        </form>
+    </div>
     <div class="container"></div>
     <div class="winnerContainer hidden">
         <div class="winnerMessage"></div>
         <button onclick="board.reset()">Restart</button>
     </div>
-    <div>
-        <form class="form" id="form">
-            <label for="playerOne">Player One Name</label>
-            <input type="text" id="playerOne">
-            <label for="playerTwo">Player Two Name</label>
-            <input type="text" id="playerTwo">
-            <button type="button" onclick="displayController.startGame()">Start</button>
-        </form>
-    </div>
+    
 </body>
 </html>
 

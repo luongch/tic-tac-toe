@@ -50,3 +50,8 @@ div .row:nth-child(odd) div:nth-child(odd) {
 .hidden {
     display: none;
 }
+
+img {
+    height: 160px;
+    width: 160px;
+}

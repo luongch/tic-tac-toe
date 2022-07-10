@@ -40,18 +40,23 @@ const board = (() => {
     const updateBoard = (e) => {
         let rowIndex = parseInt(e.target.dataset.row)
         let colIndex = parseInt(e.target.dataset.col)
-        boardState[rowIndex][colIndex] = e.target.innerHTML == 'o';
+        boardState[rowIndex][colIndex] = e.target.classList.contains('o');
     }    
 
     const reset = () => {
         let container = document.querySelector(".container");
         container.querySelectorAll('*').forEach(n => n.remove());
-        boardState = [[],[],[]]
+        boardState = [[],[],[]];
         createBoard();
         displayController.reset();
     }
 
-    return {createBoard, reset, boardState};
+    const getState = () => {
+        //this is needed because if you reference the boardState directly then you can't reset it later
+        return boardState;
+    }
+
+    return {createBoard, reset, getState};
 })();
 
 const displayController = (()=>{
@@ -64,7 +69,14 @@ const displayController = (()=>{
     placeMark = (e) => {
         if(e.target.innerHTML == "") {
             let index = parseInt(e.target.dataset.squareId);
-            e.target.innerHTML = playerOne ? 'o' : 'x';
+            let mark = document.createElement("img");
+            
+            mark.src = playerOne ?  "./images/checkbox-blank-circle-outline.svg" : "./images/sword-cross.svg";
+            mark.alt = playerOne ?  "o" : "x";
+
+            e.target.classList.add(playerOne ?  "o" : "x")
+            e.target.appendChild(mark);
+
             playerOne = !playerOne;
             currentTurn++;
 
@@ -89,12 +101,13 @@ const displayController = (()=>{
     const checkRow = (rowIndex) => {
         let trueCount = 0;
         let falseCount = 0;
+        let boardState = board.getState();
 
-        for(let i = 0; i<board.boardState.length; i++) {
-            if(board.boardState[rowIndex][i] == undefined) {
+        for(let i = 0; i< boardState.length; i++) {
+            if(boardState[rowIndex][i] == undefined) {
                 break; //if anything in the row is empty then we can stop
             }
-            board.boardState[rowIndex][i] ? trueCount++ : falseCount++;
+            boardState[rowIndex][i] ? trueCount++ : falseCount++;
         }
         checkWinner(trueCount,falseCount);
     }
@@ -102,12 +115,13 @@ const displayController = (()=>{
     const checkCol = (colIndex) => {
         let trueCount = 0;
         let falseCount = 0;
+        let boardState = board.getState();
         
-        for(let i = 0; i<board.boardState.length; i++) {
-            if(board.boardState[i][colIndex] == undefined) {
+        for(let i = 0; i<boardState.length; i++) {
+            if(boardState[i][colIndex] == undefined) {
                 break;
             }
-            board.boardState[i][colIndex] ? trueCount++ : falseCount++;
+            boardState[i][colIndex] ? trueCount++ : falseCount++;
 
         }
         checkWinner(trueCount,falseCount);
@@ -116,12 +130,13 @@ const displayController = (()=>{
     const checkDiagonal = (diagonal) => {
         let trueCount = 0;
         let falseCount = 0;
+        let boardState = board.getState();
         
         for(let i = 0; i<diagonal.length; i++) {
-            if(board.boardState[diagonal[i][0]][diagonal[i][1]] == undefined) {
+            if(boardState[diagonal[i][0]][diagonal[i][1]] == undefined) {
                 break;
             }   
-            board.boardState[diagonal[i][0]][diagonal[i][1]] ? trueCount++ : falseCount++; 
+            boardState[diagonal[i][0]][diagonal[i][1]] ? trueCount++ : falseCount++; 
         }
         checkWinner(trueCount,falseCount);
     }
@@ -131,8 +146,17 @@ const displayController = (()=>{
             winner = true;
             trueCount == 3 ?  setMessage(`${playerA.name} wins`) :  setMessage(`${playerB.name} wins`);
             showMessage();
+            disableGame();
         }
     }
+
+    const disableGame = () => {
+        let container = document.querySelector(".container");
+        container.querySelectorAll('.square').forEach(square => {
+            square.replaceWith(square.cloneNode(true)); //clone each square and remove event listener
+        });
+    }
+
     const reset = () => {
         playerOne = true;
         currentTurn = 0;
@@ -141,12 +165,12 @@ const displayController = (()=>{
     }
 
     const hideMessage = () => {
-        let winnerContainer =  document.querySelector('.winnerContainer');
+        let winnerContainer = document.querySelector('.winnerContainer');
         winnerContainer.classList.add('hidden');
     }
 
     const showMessage = () => {
-        let winnerContainer =  document.querySelector('.winnerContainer');
+        let winnerContainer = document.querySelector('.winnerContainer');
         winnerContainer.classList.remove('hidden')
     }
 
