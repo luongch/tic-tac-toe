@@ -31,6 +31,7 @@ const board = (() => {
         square.addEventListener('click', function(e) {
             placeMark(e);
             updateBoard(e);
+            square.replaceWith(square.cloneNode(true)); //remove click event by cloning 
             displayController.checkForWinner(e)
         })
 
@@ -68,7 +69,6 @@ const displayController = (()=>{
 
     placeMark = (e) => {
         if(e.target.innerHTML == "") {
-            let index = parseInt(e.target.dataset.squareId);
             let mark = document.createElement("img");
             
             mark.src = playerOne ?  "./images/checkbox-blank-circle-outline.svg" : "./images/sword-cross.svg";
